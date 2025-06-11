@@ -6,6 +6,7 @@ import { FaTrash, FaEdit, FaSave, FaTimesCircle } from 'react-icons/fa'
 // import './App.css'
 import { ClipLoader } from 'react-spinners'
 import ReactPaginate from 'react-paginate'
+import {Routes, Route, Navigate} from 'react-router-dom'
 
 const API = 'https://dummyjson.com/todos'
 const todosPerPage = 10
@@ -49,7 +50,6 @@ export default function App() {
 
   console.log('Query data:', data)
 
-
   const totalTodos = data?.total ?? 0
 
   const createTodo = useMutation({
@@ -83,8 +83,7 @@ export default function App() {
       queryClient.setQueryData(['todos', currentPage], context.previousData)
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['todos', currentPage])
-      localforage.removeItem(`todos-page-${currentPage}`)
+      queryClient.invalidateQueries(['todos', 0])
     },
   })
 
@@ -189,6 +188,8 @@ export default function App() {
   return (
     <main region="main" className="main">
       <h1>Todo App</h1>
+
+      
 
       <TodoForm
         newTodo={newTodo}
