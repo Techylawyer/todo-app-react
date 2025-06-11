@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import TodoPage from './TodoPage'
+import NotFoundPage from './NotFound'
 // import './App.css'
 
 export default function App() {
@@ -9,8 +10,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/todos" />} />
         <Route path="/todos" element={<TodoPage />} />
-        <Route path="/todos/:filter" element={<TodoPage />} />
-        {/* <Route path="*" element={<div>404 Not Found</div>} /> */}
+        {/* <Route path="/todos/:filter" element={<TodoPage />} /> */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </main>
   )

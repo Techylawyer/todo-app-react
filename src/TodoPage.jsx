@@ -6,11 +6,7 @@ import { FaTrash, FaEdit, FaSave, FaTimesCircle } from 'react-icons/fa'
 // import './App.css'
 import { ClipLoader } from 'react-spinners'
 import ReactPaginate from 'react-paginate'
-import {
-  NavLink,
-  useLocation,
-  useSearchParams,
-} from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 const API = 'https://dummyjson.com/todos'
 const todosPerPage = 10
@@ -42,19 +38,15 @@ const getTodos = async ({ queryKey }) => {
 export default function TodoPage() {
   const queryClient = useQueryClient()
   const [newTodo, setNewTodo] = useState('')
-  // const [searchKeyword, setSearchKeyword] = useState('')
-  
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const location = useLocation()
-
-  const currentPage = parseInt(searchParams.get('page')) || 0
+  const currentPage = parseInt(searchParams.get('page')) || 1
+  const zeroBasedPage = currentPage - 1
+  const filter = searchParams.get('filter') || 'all'
   const searchKeyword = searchParams.get('search') || ''
-  
-  const filterFromPath = location.pathname.split('/')[2] || 'all'
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['todos', currentPage],
+    queryKey: ['todos', zeroBasedPage],
     queryFn: getTodos,
     keepPreviousData: true,
   })
@@ -62,6 +54,11 @@ export default function TodoPage() {
   console.log('Query data:', data)
 
   const totalTodos = data?.total ?? 0
+
+  const safePage = Math.min(
+    zeroBasedPage,
+    Math.ceil((data?.total ?? 0) / todosPerPage) - 1
+  )
 
   const createTodo = useMutation({
     mutationFn: (newTodo) =>
@@ -134,8 +131,8 @@ export default function TodoPage() {
   const deleteTodo = useMutation({
     mutationFn: (id) => axios.delete(`${API}/${id}`),
     onMutate: async (id) => {
-      await queryClient.cancelQueries(['todos', currentPage])
-      const previousData = queryClient.getQueryData(['todos', currentPage]) || {
+      await queryClient.cancelQueries(['todos', safePage])
+      const previousData = queryClient.getQueryData(['todos', safePage]) || {
         todos: [],
         total: 0,
       }
@@ -153,19 +150,19 @@ export default function TodoPage() {
       return { previousData }
     },
     onError: (err, id, context) => {
-      queryClient.setQueryData(['todos', currentPage], context.previousData)
+      queryClient.setQueryData(['todos', safePage], context.previousData)
     },
     onSettled: () => {
       queryClient.invalidateQueries(['todos', currentPage])
-      localforage.removeItem(`todos-page-${currentPage}`)
+      localforage.removeItem(`todos-page-${safePage}`)
     },
   })
 
   const filteredTodos = (data?.todos || []).filter((todo) => {
     const matchesFilter =
-      filterFromPath === 'all'
+      filter === 'all'
         ? true
-        : filterFromPath === 'active'
+        : filter === 'active'
         ? !todo.completed
         : todo.completed
 
@@ -212,11 +209,12 @@ export default function TodoPage() {
           setSearchParams((prev) => {
             const next = new URLSearchParams(prev)
             next.set('search', value)
-            next.set('page', 0) // reset to page 0 when searching
+            // next.set('page', 0)
             return next
           })
         }}
       />
+
       <section role="region" aria-label="Todo List">
         {isLoading ? (
           <div role="status" aria-live="polite" aria-busy="true">
@@ -232,12 +230,18 @@ export default function TodoPage() {
           />
         )}
       </section>
+
       <ReactPaginate
-        previousLabel={'← Previous'}
-        nextLabel={'Next →'}
+        previousLabel={'Previous'}
+        nextLabel={'Next'}
         pageCount={Math.ceil(totalTodos / todosPerPage)}
-        onPageChange={({ selected }) => setSearchParams({ page: selected })}
-        forcePage={currentPage}
+        onPageChange={({ selected }) => {
+          const next = new URLSearchParams(searchParams)
+          next.set('page', selected + 1)
+          // next.set('filter', 'all')
+          setSearchParams(next)
+        }}
+        forcePage={safePage}
         containerClassName={'pagination'}
         activeClassName={'active'}
       />
@@ -246,28 +250,33 @@ export default function TodoPage() {
 }
 
 function FilterButtons() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const current = searchParams.get('filter') || 'all'
+
+  const setFilter = (filter) => {
+    const next = new URLSearchParams(searchParams)
+    next.set('filter', filter)
+    // next.set('page', '0')
+    setSearchParams(next)
+  }
+
   return (
     <section className="filter-section" role="region" aria-label="Filter Todos">
-      {/* <button onClick={() => setFilter('all')} disabled={current === 'all'}>
-        All Todos
+      <button onClick={() => setFilter('all')} disabled={current === 'all'}>
+        All
       </button>
       <button
         onClick={() => setFilter('active')}
         disabled={current === 'active'}
       >
-        Active Todos
+        Active
       </button>
       <button
         onClick={() => setFilter('completed')}
         disabled={current === 'completed'}
       >
-        Completed Todos
-      </button> */}
-      <NavLink to="/todos" end>
-        All
-      </NavLink>
-      <NavLink to="/todos/active">Active</NavLink>
-      <NavLink to="/todos/completed">Completed</NavLink>
+        Completed
+      </button>
     </section>
   )
 }
