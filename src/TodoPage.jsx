@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import localforage from 'localforage'
 import { FaTrash, FaEdit, FaSave, FaTimesCircle } from 'react-icons/fa'
-// import './App.css'
 import { ClipLoader } from 'react-spinners'
 import ReactPaginate from 'react-paginate'
 import { useSearchParams } from 'react-router-dom'
@@ -68,8 +67,11 @@ export default function TodoPage() {
         userId: 1,
       }),
     onMutate: async (newTodo) => {
-      await queryClient.cancelQueries(['todos', currentPage])
-      const previousData = queryClient.getQueryData(['todos', currentPage]) || {
+      await queryClient.cancelQueries(['todos', zeroBasedPage])
+      const previousData = queryClient.getQueryData([
+        'todos',
+        zeroBasedPage,
+      ]) || {
         todos: [],
         total: 0,
       }
@@ -82,16 +84,16 @@ export default function TodoPage() {
         total: previousData.total + 1,
       }
 
-      queryClient.setQueryData(['todos', currentPage], newData)
-      await localforage.setItem(`todos-page-${currentPage}`, newData)
+      queryClient.setQueryData(['todos', zeroBasedPage], newData)
+      await localforage.setItem(`todos-page-${zeroBasedPage}`, newData)
 
       return { previousData }
     },
     onError: (err, newTodo, context) => {
-      queryClient.setQueryData(['todos', currentPage], context.previousData)
+      queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['todos', 0])
+      queryClient.invalidateQueries(['todos', zeroBasedPage])
     },
   })
 
@@ -99,40 +101,45 @@ export default function TodoPage() {
     mutationFn: ({ id, ...updatedTodo }) =>
       axios.put(`${API}/${id}`, updatedTodo),
     onMutate: async (updatedTodo) => {
-      await queryClient.cancelQueries(['todos', currentPage])
-      const previousData = queryClient.getQueryData(['todos', currentPage]) || {
+      await queryClient.cancelQueries(['todos', zeroBasedPage])
+      const previousData = queryClient.getQueryData([
+        'todos',
+        zeroBasedPage,
+      ]) || {
         todos: [],
         total: 0,
       }
 
-      const updated = previousData.todos.map((todo) =>
+      const updatedTodos = previousData.todos.map((todo) =>
         todo.id === updatedTodo.id ? { ...todo, ...updatedTodo } : todo
       )
 
       const newData = {
-        todos: updated,
+        todos: updatedTodos,
         total: previousData.total,
       }
 
-      queryClient.setQueryData(['todos', currentPage], newData)
-      await localforage.setItem(`todos-page-${currentPage}`, newData)
+      queryClient.setQueryData(['todos', zeroBasedPage], newData)
+      await localforage.setItem(`todos-page-${zeroBasedPage}`, newData)
 
       return { previousData }
     },
     onError: (err, updatedTodo, context) => {
-      queryClient.setQueryData(['todos', currentPage], context.previousTodos)
+      queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['todos', currentPage])
-      localforage.removeItem(`todos-page-${currentPage}`)
+      queryClient.invalidateQueries(['todos', zeroBasedPage])
     },
   })
 
   const deleteTodo = useMutation({
     mutationFn: (id) => axios.delete(`${API}/${id}`),
     onMutate: async (id) => {
-      await queryClient.cancelQueries(['todos', safePage])
-      const previousData = queryClient.getQueryData(['todos', safePage]) || {
+      await queryClient.cancelQueries(['todos', zeroBasedPage])
+      const previousData = queryClient.getQueryData([
+        'todos',
+        zeroBasedPage,
+      ]) || {
         todos: [],
         total: 0,
       }
@@ -144,17 +151,16 @@ export default function TodoPage() {
         total: previousData.total - 1,
       }
 
-      queryClient.setQueryData(['todos', currentPage], newData)
-      await localforage.setItem(`todos-page-${currentPage}`, newData)
+      queryClient.setQueryData(['todos', zeroBasedPage], newData)
+      await localforage.setItem(`todos-page-${zeroBasedPage}`, newData)
 
       return { previousData }
     },
     onError: (err, id, context) => {
-      queryClient.setQueryData(['todos', safePage], context.previousData)
+      queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['todos', currentPage])
-      localforage.removeItem(`todos-page-${safePage}`)
+      queryClient.invalidateQueries(['todos', zeroBasedPage])
     },
   })
 
@@ -299,6 +305,10 @@ function TodoList({ todoList, onUpdate, onDelete }) {
 function TodoListItem({ todo, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(todo.todo)
+
+  useEffect(() => {
+    setEditValue(todo.todo)
+  }, [todo.todo])
 
   const handleSave = () => {
     onUpdate({ id: todo.id, todo: editValue, completed: todo.completed })
