@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
+import { FaArrowLeft } from 'react-icons/fa'
 
 export default function TodoItemDetail() {
   const { todoId } = useParams()
@@ -33,7 +34,7 @@ export default function TodoItemDetail() {
     >
       <h2>Todo Detail</h2>
       <p>
-        <strong>ID:</strong> {todo.id}
+        <strong>Task ID:</strong> {todo.id}
       </p>
       <p>
         <strong>Task:</strong> {todo.todo}
@@ -42,10 +43,12 @@ export default function TodoItemDetail() {
         <strong>Completed:</strong> {todo.completed ? 'Yes' : 'No'}
       </p>
       <p>
-        <strong>User:</strong> {todo.userId || 1}
+        <strong>User ID:</strong> {todo.userId || 1}
       </p>
 
-      <button onClick={() => navigate('/todos')}>← Back to List</button>
+      <button onClick={() => navigate('/todos')}>
+        <FaArrowLeft /> Back to List
+      </button>
     </section>
   )
 }
