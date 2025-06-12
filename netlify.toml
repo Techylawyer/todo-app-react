@@ -6,6 +6,6 @@ command = "npm run build"
 NODE_VERSION = "20"
 
 [[redirects]]
-from ="/*
+from ="/*"
 to ="index.html"
 status = 200
