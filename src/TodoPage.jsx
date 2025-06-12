@@ -5,7 +5,7 @@ import localforage from 'localforage'
 import { FaTrash, FaEdit, FaSave, FaTimesCircle } from 'react-icons/fa'
 import { ClipLoader } from 'react-spinners'
 import ReactPaginate from 'react-paginate'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Outlet, Link } from 'react-router-dom'
 
 const API = 'https://dummyjson.com/todos'
 const todosPerPage = 10
@@ -251,6 +251,8 @@ export default function TodoPage() {
         containerClassName={'pagination'}
         activeClassName={'active'}
       />
+
+      <Outlet />
     </>
   )
 }
@@ -363,7 +365,9 @@ function TodoListItem({ todo, onUpdate, onDelete }) {
         checked={todo.completed}
         onChange={handleToggle}
       />
-      <span>{todo.todo}</span>
+      <Link to={`./${todo.id}`}>
+        <span>{todo.todo}</span>
+      </Link>
       <button aria-label="Edit Todo" onClick={() => setIsEditing(true)}>
         <FaEdit />
       </button>
