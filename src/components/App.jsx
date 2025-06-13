@@ -3,31 +3,26 @@ import TodoPage from './TodoPage'
 import NotFoundPage from './NotFound'
 import TodoItemDetail from './TodoItemDetail'
 import { ErrorBoundary } from 'react-error-boundary'
-import ErrorFallback from './ErrorBoundary'
 import TestError from './TestError'
-import './App.css'
+import '../styles/App.css'
+import { Button, Box, Heading } from '@chakra-ui/react'
 
 export default function App() {
   const navigate = useNavigate()
 
-  function ErrorFallback(){
-return ( <aside>
-      <h1>404 - Page Not Found</h1>
-      <p>Sorry, the page you are looking for does not exist.</p>
-      <Link to="/">
-        Go back to Home
-      </Link>
-    </aside>)
+  function ErrorFallback() {
+    return <NotFoundPage />
   }
+
   return (
     <ErrorBoundary
-      FallbackComponent={ErrorFallback}
+      FallbackComponent={<ErrorFallback />}
       onReset={() => {
         navigate('/todos')
       }}
     >
-      <main region="main" className="main">
-        <h1>Todo App</h1>
+      <Box as="main" region="main" className="main bg-red" p={4} bg={'green.100'} w="100%">
+        <Heading>Todo App</Heading>
         <Routes>
           <Route path="/" element={<Navigate to="/todos" />} />
           <Route path="/todos/" element={<TodoPage />} />
@@ -42,7 +37,7 @@ return ( <aside>
             }
           />
         </Routes>
-      </main>
+      </Box>
     </ErrorBoundary>
   )
 }

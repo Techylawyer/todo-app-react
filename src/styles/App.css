@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 
 
 body {
-    font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* .spinner {
@@ -20,4 +20,3 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   } */
-  

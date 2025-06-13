@@ -1,13 +1,17 @@
+import { useState } from 'react'
+import TodoForm from './TodoForm'
+import SearchInput from './SearchInput'
+import FilterButtons from './FilterButtons'
+import TodoList from './TodoList'
+import API from './utilities/api'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
 import axios from 'axios'
 import localforage from 'localforage'
-import { FaTrash, FaEdit, FaSave, FaTimesCircle } from 'react-icons/fa'
 import { ClipLoader } from 'react-spinners'
 import ReactPaginate from 'react-paginate'
 import { useSearchParams, Outlet, Link } from 'react-router-dom'
 
-const API = 'https://dummyjson.com/todos'
+// const API = 'https://dummyjson.com/todos'
 const todosPerPage = 10
 
 localforage.config({
@@ -206,21 +210,17 @@ export default function TodoPage() {
         setNewTodo={setNewTodo}
         handleSubmit={handleSubmit}
       />
-
       <FilterButtons />
-
       <SearchInput
         searchKeyword={searchKeyword}
         onSearchChange={(value) => {
           setSearchParams((prev) => {
             const next = new URLSearchParams(prev)
             next.set('search', value)
-            // next.set('page', 0)
             return next
           })
         }}
       />
-
       <section role="region" aria-label="Todo List">
         {isLoading ? (
           <div role="status" aria-live="polite" aria-busy="true">
@@ -236,7 +236,6 @@ export default function TodoPage() {
           />
         )}
       </section>
-
       <ReactPaginate
         previousLabel={'Previous'}
         nextLabel={'Next'}
@@ -251,160 +250,10 @@ export default function TodoPage() {
         containerClassName={'pagination'}
         activeClassName={'active'}
       />
-
       <Outlet />
     </>
   )
 }
 
-function FilterButtons() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const current = searchParams.get('filter') || 'all'
 
-  const setFilter = (filter) => {
-    const next = new URLSearchParams(searchParams)
-    next.set('filter', filter)
-    // next.set('page', '0')
-    setSearchParams(next)
-  }
 
-  return (
-    <section className="filter-section" role="region" aria-label="Filter Todos">
-      <button onClick={() => setFilter('all')} disabled={current === 'all'}>
-        All
-      </button>
-      <button
-        onClick={() => setFilter('active')}
-        disabled={current === 'active'}
-      >
-        Active
-      </button>
-      <button
-        onClick={() => setFilter('completed')}
-        disabled={current === 'completed'}
-      >
-        Completed
-      </button>
-    </section>
-  )
-}
-
-function TodoList({ todoList, onUpdate, onDelete }) {
-  return (
-    <ul>
-      {todoList.map((todo) => (
-        <TodoListItem
-          key={todo.id}
-          todo={todo}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-        />
-      ))}
-    </ul>
-  )
-}
-
-function TodoListItem({ todo, onUpdate, onDelete }) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(todo.todo)
-
-  useEffect(() => {
-    setEditValue(todo.todo)
-  }, [todo.todo])
-
-  const handleSave = () => {
-    onUpdate({ id: todo.id, todo: editValue, completed: todo.completed })
-    setIsEditing(false)
-  }
-
-  const handleCancel = () => {
-    setEditValue(todo.todo)
-    setIsEditing(false)
-  }
-
-  const handleToggle = () => {
-    onUpdate({ id: todo.id, todo: todo.todo, completed: !todo.completed })
-  }
-
-  if (isEditing) {
-    return (
-      <li>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleSave()
-          }}
-        >
-          <input
-            autoFocus
-            type="text"
-            name="edit-todo"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-          />
-          <button type="submit" aria-label="Save Todo">
-            <FaSave />
-          </button>
-          <button
-            aria-label="Cancel Editing"
-            type="button"
-            onClick={handleCancel}
-          >
-            <FaTimesCircle />
-          </button>
-        </form>
-      </li>
-    )
-  }
-
-  return (
-    <li style={todo.completed ? { textDecoration: 'line-through' } : {}}>
-      <input
-        type="checkbox"
-        name="check-completed"
-        checked={todo.completed}
-        onChange={handleToggle}
-      />
-      <Link to={`./${todo.id}`}>
-        <span>{todo.todo}</span>
-      </Link>
-      <button aria-label="Edit Todo" onClick={() => setIsEditing(true)}>
-        <FaEdit />
-      </button>
-      <button aria-label="Delete Todo" onClick={() => onDelete(todo.id)}>
-        <FaTrash />
-      </button>
-    </li>
-  )
-}
-
-function TodoForm({ newTodo, setNewTodo, handleSubmit }) {
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        autoFocus
-        type="text"
-        name="new-todo"
-        value={newTodo}
-        onChange={(e) => setNewTodo(e.target.value)}
-        placeholder="What do you want to do?"
-        aria-label="Enter New Todo"
-      />
-      <button type="submit">Create Todo</button>
-    </form>
-  )
-}
-
-function SearchInput({ searchKeyword, onSearchChange }) {
-  return (
-    <section role="region" aria-label="Search Todos">
-      <input
-        type="text"
-        placeholder="Search todos..."
-        name="search-todo"
-        value={searchKeyword}
-        onChange={(e) => onSearchChange(e.target.value)}
-      />
-    </section>
-  )
-}
