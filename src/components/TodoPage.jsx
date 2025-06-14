@@ -228,7 +228,9 @@ export default function TodoPage() {
             <ClipLoader />
           </div>
         ) : isError ? (
-          <div role="alert" className='text-destructive'>Error loading todos: {error.message}</div>
+          <div role="alert" className="text-destructive">
+            Error loading todos: {error.message}
+          </div>
         ) : (
           <TodoList
             todoList={filteredTodos}
@@ -248,7 +250,7 @@ export default function TodoPage() {
           setSearchParams(next)
         }}
         forcePage={safePage}
-        containerClassName="flex items-center flex-wrap justify-center space-x-2 -mt-8  cursor-pointer gap-2 text-center "
+        containerClassName="flex items-center flex-wrap justify-center space-x-2 -mt-2  cursor-pointer gap-2 text-center mb-8"
         pageClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary transition"
         pageLinkClassName="text-sm  hover:bg-background hover:text-primary"
         activeClassName="bg-primary text-background"

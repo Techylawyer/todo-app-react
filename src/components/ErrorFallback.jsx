@@ -9,7 +9,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }) {
   }
   return (
     <aside role="alert" className="flex flex-col p-10 text-center">
-      <h2 className="text-destructive text-2xl">Something went wrong:</h2>
+      <h2 className="text-destructive text-2xl text-bold">There was a problem loading this page:</h2>
       <pre className="whitespace-pre-wrap m-5 text-xl">{error.message}</pre>
       <Button className="w-50 m-auto cursor-pointer" onClick={handleReset}>
         Go to Home Page

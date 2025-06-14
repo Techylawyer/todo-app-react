@@ -37,7 +37,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
           }}
         >
           <Input
-            className="w-80"
+            className="w-full"
             autoFocus
             type="text"
             name="edit-todo"
@@ -69,9 +69,9 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
   return (
     <li
       style={todo.completed ? { textDecoration: 'line-through' } : {}}
-      className="grid grid-cols-2 items-center justify-center gap-y-10 mb-5"
+      className="flex gap-x-4"
     >
-      <section>
+      <section className="flex items-center gap-5">
         <input
           className="h-5 w-5 accent-primary"
           type="checkbox"
@@ -80,7 +80,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
           onChange={handleToggle}
         />
         <Link to={`./${todo.id}`}>
-          <span className="hover:bg-blue p-4 w-80">{todo.todo}</span>
+          <p className="hover:bg-blue p-2 w-80">{todo.todo}</p>
         </Link>
       </section>
 
