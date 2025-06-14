@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import TodoForm from './TodoForm'
 import SearchInput from './SearchInput'
 import FilterButtons from './FilterButtons'
@@ -7,9 +7,9 @@ import API from './utilities/api'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import localforage from 'localforage'
-import { ClipLoader } from 'react-spinners'
 import ReactPaginate from 'react-paginate'
 import { useSearchParams, Outlet, Link } from 'react-router-dom'
+import { Loader } from 'lucide-react'
 
 const todosPerPage = 10
 
@@ -23,8 +23,8 @@ const getTodos = async ({ queryKey }) => {
 
   const cached = await localforage.getItem(`todos-page-${page}`)
   if (cached) {
-    console.log('Loaded from cache:', cached)
-    console.log('cached.todos:', cached.todos)
+    // console.log('Loaded from cache:', cached)
+    // console.log('cached.todos:', cached.todos)
     return cached
   }
 
@@ -53,7 +53,7 @@ export default function TodoPage() {
     keepPreviousData: true,
   })
 
-  console.log('Query data:', data)
+  // console.log('Query data:', data)
 
   const totalTodos = data?.total ?? 0
 
@@ -199,8 +199,8 @@ export default function TodoPage() {
     }
   }
 
-  console.log('Fetched todos:', data?.todos)
-  console.log('Filtered todos:', filteredTodos)
+  // console.log('Fetched todos:', data?.todos)
+  // console.log('Filtered todos:', filteredTodos)
 
   return (
     <>
@@ -225,7 +225,7 @@ export default function TodoPage() {
       <section role="region" aria-label="Todo List">
         {isLoading ? (
           <div role="status" aria-live="polite" aria-busy="true">
-            <ClipLoader />
+            <Loader className='w-20 h-20 text-primary animate-spin'/>
           </div>
         ) : isError ? (
           <div role="alert" className="text-destructive">
@@ -250,7 +250,7 @@ export default function TodoPage() {
           setSearchParams(next)
         }}
         forcePage={safePage}
-        containerClassName="flex items-center flex-wrap justify-center space-x-2 -mt-2  cursor-pointer gap-2 text-center mb-8"
+        containerClassName="flex items-center flex-wrap justify-center space-x-2  cursor-pointer gap-2 text-center mb-8"
         pageClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary transition"
         pageLinkClassName="text-sm  hover:bg-background hover:text-primary"
         activeClassName="bg-primary text-background"

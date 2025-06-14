@@ -77,7 +77,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
       style={todo.completed ? { textDecoration: 'line-through' } : {}}
       className="flex gap-5 items-center justify-between"
     >
-      <section className="flex items-center">
+      <div className="flex items-center">
         <input
           className="h-5 w-5 accent-primary"
           type="checkbox"
@@ -88,7 +88,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
         <Link to={`./${todo.id}`}>
           <p className="hover:bg-blue p-2 w-full">{todo.todo}</p>
         </Link>
-      </section>
+      </div>
 
       <section className="btn-wrap flex gap-5">
         <Button

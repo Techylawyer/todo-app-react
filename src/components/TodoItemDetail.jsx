@@ -32,7 +32,7 @@ export default function TodoItemDetail() {
     <section
       role="region"
       aria-label="Todo Item Detail"
-      className="todoItemDetail h-screen flex flex-col gap-5 pt-5"
+      className="todoItemDetail flex flex-col item-center gap-5 pt-5"
     >
       <p>
         <strong>Task ID:</strong> {todo.id}
@@ -48,7 +48,7 @@ export default function TodoItemDetail() {
       </p>
 
       <Button
-        className="w-50 cursor-pointer text-left"
+        className="w-50 cursor-pointer"
         onClick={() => navigate('/todos')}
       >
         <FaArrowLeft /> Back to List
