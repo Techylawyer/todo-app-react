@@ -17,7 +17,7 @@ export default function TodoForm({ newTodo, setNewTodo, handleSubmit }) {
         placeholder="What do you want to do?"
         aria-label="Enter New Todo"
       />
-      <Button type="submit" className="rounded-l-none">
+      <Button type="submit" className="rounded-l-none cursor-pointer">
         Create Todo
       </Button>
     </form>

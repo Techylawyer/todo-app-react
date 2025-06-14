@@ -20,7 +20,7 @@ export default function App() {
       <main
         region="main"
         className="flex flex-col items-center 
-         gap-10 w-full h-dvh bg-secondary p-5"
+         gap-10 w-full h-lvh bg-secondary p-5"
       >
         <h1 className="text-center text-4xl font-extrabold tracking-tight text-primary mt-2">
           Todo App

@@ -46,7 +46,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
           />
           <Button
             size="icon"
-            className="size-6"
+            className="size-6 cursor-pointer"
             type="submit"
             aria-label="Save Todo"
           >
@@ -54,7 +54,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
           </Button>
           <Button
             size="icon"
-            className="size-6"
+            className="size-6 cursor-pointer"
             aria-label="Cancel Editing"
             type="button"
             onClick={handleCancel}
@@ -87,7 +87,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
       <section className="btn-wrap flex gap-5">
         <Button
           size="icon"
-          className="size-6"
+          className="size-6 cursor-pointer"
           aria-label="Edit Todo"
           onClick={() => setIsEditing(true)}
         >
@@ -95,7 +95,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
         </Button>
         <Button
           size="icon"
-          className="size-6"
+          className="size-6 cursor-pointer"
           aria-label="Delete Todo"
           onClick={() => onDelete(todo.id)}
         >

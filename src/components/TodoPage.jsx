@@ -248,7 +248,7 @@ export default function TodoPage() {
           setSearchParams(next)
         }}
         forcePage={safePage}
-        containerClassName="flex items-center flex-wrap justify-center space-x-2 -mt-8  cursor-pointer gap-2 text-center"
+        containerClassName="flex items-center flex-wrap justify-center space-x-2 -mt-8  cursor-pointer gap-2 text-center "
         pageClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary transition"
         pageLinkClassName="text-sm  hover:bg-background hover:text-primary"
         activeClassName="bg-primary text-background"

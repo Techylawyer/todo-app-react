@@ -32,7 +32,7 @@ export default function TodoItemDetail() {
         <p className="text-destructive text-3xl font-bold pb-10">
           Todo not found.
         </p>
-        <Button onClick={() => navigate('/todos')}>
+        <Button className="cursor-pointer" onClick={() => navigate('/todos')}>
           <FaArrowLeft /> Back to List
         </Button>
       </section>
@@ -58,7 +58,10 @@ export default function TodoItemDetail() {
         <strong>User ID:</strong> {todo.userId || 1}
       </p>
 
-      <Button className="w-50" onClick={() => navigate('/todos')}>
+      <Button
+        className="w-50 cursor-pointer"
+        onClick={() => navigate('/todos')}
+      >
         <FaArrowLeft /> Back to List
       </Button>
     </section>

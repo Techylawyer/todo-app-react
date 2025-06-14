@@ -21,19 +21,19 @@ export default function FilterButtons() {
       <Button
         onClick={() => setFilter('all')}
         disabled={current === 'all'}
-        className="btn btn-active btn-primary"
+        className="btn btn-active btn-primary cursor-pointer"
       >
         All
       </Button>
       <Button
-        className="btn btn-active btn-primary"
+        className="btn btn-active btn-primary cursor-pointer"
         onClick={() => setFilter('active')}
         disabled={current === 'active'}
       >
         Active
       </Button>
       <Button
-        className="btn btn-active btn-primary"
+        className="btn btn-active btn-primary cursor-pointer"
         onClick={() => setFilter('completed')}
         disabled={current === 'completed'}
       >

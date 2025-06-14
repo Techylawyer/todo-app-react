@@ -11,7 +11,7 @@ export default function NotFoundPage() {
       <p className="text-destructive">
         Sorry, the page you are looking for does not exist.
       </p>
-      <Button className="w-50 m-auto">
+      <Button className="w-50 m-auto cursor-pointer">
         <FaArrowLeft />
         <Link to="/">Go back to Home</Link>
       </Button>

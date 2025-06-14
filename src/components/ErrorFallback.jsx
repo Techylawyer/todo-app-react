@@ -11,7 +11,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }) {
     <aside role="alert" className="flex flex-col p-10 text-center">
       <h2 className="text-destructive text-2xl">Something went wrong:</h2>
       <pre className="whitespace-pre-wrap m-5 text-xl">{error.message}</pre>
-      <Button className="w-50 m-auto" onClick={handleReset}>
+      <Button className="w-50 m-auto cursor-pointer" onClick={handleReset}>
         Go to Home Page
       </Button>
     </aside>
