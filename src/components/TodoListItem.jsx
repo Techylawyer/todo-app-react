@@ -30,7 +30,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
     return (
       <li>
         <form
-          className="flex gap-5 justify-center m-auto"
+          className="flex justify-between items-center gap-8"
           onSubmit={(e) => {
             e.preventDefault()
             handleSave()
@@ -44,23 +44,25 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
           />
-          <Button
-            size="icon"
-            className="size-6 cursor-pointer"
-            type="submit"
-            aria-label="Save Todo"
-          >
-            <FaCheckCircle />
-          </Button>
-          <Button
-            size="icon"
-            className="size-6 cursor-pointer"
-            aria-label="Cancel Editing"
-            type="button"
-            onClick={handleCancel}
-          >
-            <FaTimesCircle />
-          </Button>
+          <div className="btn-group flex justify-between gap-5">
+            <Button
+              size="icon"
+              className="size-6 cursor-pointer"
+              type="submit"
+              aria-label="Save Todo"
+            >
+              <FaCheckCircle />
+            </Button>
+            <Button
+              size="icon"
+              className="size-6 cursor-pointer"
+              aria-label="Cancel Editing"
+              type="button"
+              onClick={handleCancel}
+            >
+              <FaTimesCircle />
+            </Button>
+          </div>
         </form>
       </li>
     )
@@ -69,9 +71,9 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
   return (
     <li
       style={todo.completed ? { textDecoration: 'line-through' } : {}}
-      className="flex gap-x-4"
+      className="flex gap-5 items-center justify-between"
     >
-      <section className="flex items-center gap-5">
+      <section className="flex items-center">
         <input
           className="h-5 w-5 accent-primary"
           type="checkbox"
@@ -80,7 +82,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
           onChange={handleToggle}
         />
         <Link to={`./${todo.id}`}>
-          <p className="hover:bg-blue p-2 w-80">{todo.todo}</p>
+          <p className="hover:bg-blue p-2 w-full">{todo.todo}</p>
         </Link>
       </section>
 
