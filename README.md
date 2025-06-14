@@ -61,7 +61,7 @@ npm run dev
 
 ## API Integration
  
- * The DummyJSON Todo API (https://dummyjson.com/todos) for generating a default list of todos
+ * [The DummyJSON Todo API] (https://dummyjson.com/todos) for generating a default list of todos
  * Tanstack (React) Query  for data fetching
  * Localforage for data caching and persistence
 
