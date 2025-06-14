@@ -11,13 +11,13 @@ This todo app built with React provides a simple and intuitive way of tracking y
 * Filter tasks by all, active and completed
 * Search tasks
 
-![Todo App](image-1.png)
+![Todo App](/src/images/image-1.png)
 
 * Paginated tasks (10 tasks per page)
 
-![Todo pages](image-3.png)
+![Todo pages](src/images/image-3.png)
 
-* View individual tasks to get more details ![Todo details](image-2.png)
+* View individual tasks to get more details ![Todo details](src/images/image-2.png)
 
 ## Technology Stack
 
