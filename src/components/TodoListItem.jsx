@@ -17,7 +17,11 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
     setIsEditing(false)
   }
 
-  const handleCancel = () => {
+  const handleCancel = (e) => {
+    if (e.keyCode === 27) {
+      setEditValue(todo.todo)
+      setIsEditing(false)
+    }
     setEditValue(todo.todo)
     setIsEditing(false)
   }
