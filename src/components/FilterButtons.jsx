@@ -1,4 +1,3 @@
-import SearchInput from './SearchInput'
 import { Button } from '/components/ui/button'
 import { useSearchParams } from 'react-router-dom'
 
