@@ -1,5 +1,4 @@
-
-import TodoListItem from "./TodoListItem"
+import TodoListItem from './TodoListItem'
 
 export default function TodoList({ todoList, onUpdate, onDelete }) {
   return (
@@ -15,4 +14,3 @@ export default function TodoList({ todoList, onUpdate, onDelete }) {
     </ul>
   )
 }
-

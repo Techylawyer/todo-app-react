@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react"
-import { FaTrash, FaEdit, FaSave, FaTimesCircle } from 'react-icons/fa'
+import React, { useEffect, useState } from 'react'
+import { FaTrash, FaEdit, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { Button } from '/components/ui/button'
+import { Input } from '/components/ui/input'
 
 export default function TodoListItem({ todo, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false)
@@ -28,50 +30,78 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
     return (
       <li>
         <form
+          className="flex gap-5 justify-center m-auto"
           onSubmit={(e) => {
             e.preventDefault()
             handleSave()
           }}
         >
-          <input
+          <Input
+            className="w-80"
             autoFocus
             type="text"
             name="edit-todo"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
           />
-          <button type="submit" aria-label="Save Todo">
-            <FaSave />
-          </button>
-          <button
+          <Button
+            size="icon"
+            className="size-6"
+            type="submit"
+            aria-label="Save Todo"
+          >
+            <FaCheckCircle />
+          </Button>
+          <Button
+            size="icon"
+            className="size-6"
             aria-label="Cancel Editing"
             type="button"
             onClick={handleCancel}
           >
             <FaTimesCircle />
-          </button>
+          </Button>
         </form>
       </li>
     )
   }
 
   return (
-    <li style={todo.completed ? { textDecoration: 'line-through' } : {}}>
-      <input
-        type="checkbox"
-        name="check-completed"
-        checked={todo.completed}
-        onChange={handleToggle}
-      />
-      <Link to={`./${todo.id}`}>
-        <span>{todo.todo}</span>
-      </Link>
-      <button aria-label="Edit Todo" onClick={() => setIsEditing(true)}>
-        <FaEdit />
-      </button>
-      <button aria-label="Delete Todo" onClick={() => onDelete(todo.id)}>
-        <FaTrash />
-      </button>
+    <li
+      style={todo.completed ? { textDecoration: 'line-through' } : {}}
+      className="grid grid-cols-2 items-center justify-center gap-y-10 mb-5"
+    >
+      <section>
+        <input
+          className="h-5 w-5 accent-primary"
+          type="checkbox"
+          name="check-completed"
+          checked={todo.completed}
+          onChange={handleToggle}
+        />
+        <Link to={`./${todo.id}`}>
+          <span className="hover:bg-blue p-4 w-80">{todo.todo}</span>
+        </Link>
+      </section>
+
+      <section className="btn-wrap flex gap-5">
+        <Button
+          size="icon"
+          className="size-6"
+          aria-label="Edit Todo"
+          onClick={() => setIsEditing(true)}
+        >
+          <FaEdit />
+        </Button>
+        <Button
+          size="icon"
+          className="size-6"
+          aria-label="Delete Todo"
+          onClick={() => onDelete(todo.id)}
+        >
+          <FaTrash />
+        </Button>
+      </section>
     </li>
   )
 }

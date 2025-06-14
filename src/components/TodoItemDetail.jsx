@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { FaArrowLeft } from 'react-icons/fa'
+import { Button } from '/components/ui/button'
 
 export default function TodoItemDetail() {
   const { todoId } = useParams()
@@ -23,16 +24,27 @@ export default function TodoItemDetail() {
   const todo = findTodo()
 
   if (!todo) {
-    return <div>Todo not found.</div>
+    return (
+      <section
+        role="alert"
+        className="flex flex-col gap-5 pt-10 h-screen text-center"
+      >
+        <p className="text-destructive text-3xl font-bold pb-10">
+          Todo not found.
+        </p>
+        <Button onClick={() => navigate('/todos')}>
+          <FaArrowLeft /> Back to List
+        </Button>
+      </section>
+    )
   }
 
   return (
     <section
       role="region"
       aria-label="Todo Item Detail"
-      className="todoItemDetail"
+      className="todoItemDetail h-screen flex flex-col gap-5 pt-5"
     >
-      <h2>Todo Detail</h2>
       <p>
         <strong>Task ID:</strong> {todo.id}
       </p>
@@ -46,9 +58,9 @@ export default function TodoItemDetail() {
         <strong>User ID:</strong> {todo.userId || 1}
       </p>
 
-      <button onClick={() => navigate('/todos')}>
+      <Button className="w-50" onClick={() => navigate('/todos')}>
         <FaArrowLeft /> Back to List
-      </button>
+      </Button>
     </section>
   )
 }

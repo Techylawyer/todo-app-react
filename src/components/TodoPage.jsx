@@ -11,7 +11,6 @@ import { ClipLoader } from 'react-spinners'
 import ReactPaginate from 'react-paginate'
 import { useSearchParams, Outlet, Link } from 'react-router-dom'
 
-// const API = 'https://dummyjson.com/todos'
 const todosPerPage = 10
 
 localforage.config({
@@ -210,24 +209,26 @@ export default function TodoPage() {
         setNewTodo={setNewTodo}
         handleSubmit={handleSubmit}
       />
-      <FilterButtons />
-      <SearchInput
-        searchKeyword={searchKeyword}
-        onSearchChange={(value) => {
-          setSearchParams((prev) => {
-            const next = new URLSearchParams(prev)
-            next.set('search', value)
-            return next
-          })
-        }}
-      />
+      <section className="filter-search flex gap-2 justify-center w-80 md:w-100">
+        <FilterButtons />
+        <SearchInput
+          searchKeyword={searchKeyword}
+          onSearchChange={(value) => {
+            setSearchParams((prev) => {
+              const next = new URLSearchParams(prev)
+              next.set('search', value)
+              return next
+            })
+          }}
+        />
+      </section>
       <section role="region" aria-label="Todo List">
         {isLoading ? (
           <div role="status" aria-live="polite" aria-busy="true">
             <ClipLoader />
           </div>
         ) : isError ? (
-          <div role="alert">Error loading todos: {error.message}</div>
+          <div role="alert" className='text-destructive'>Error loading todos: {error.message}</div>
         ) : (
           <TodoList
             todoList={filteredTodos}
@@ -247,13 +248,17 @@ export default function TodoPage() {
           setSearchParams(next)
         }}
         forcePage={safePage}
-        containerClassName={'pagination'}
-        activeClassName={'active'}
+        containerClassName="flex items-center flex-wrap justify-center space-x-2 -mt-8  cursor-pointer gap-2 text-center"
+        pageClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary transition"
+        pageLinkClassName="text-sm  hover:bg-background hover:text-primary"
+        activeClassName="bg-primary text-background"
+        previousClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary"
+        nextClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary"
+        breakClassName="px-3 py-1"
+        disabledClassName="opacity-50 cursor-not-allowed"
+        renderOnZeroPageCount={null}
       />
       <Outlet />
     </>
   )
 }
-
-
-
