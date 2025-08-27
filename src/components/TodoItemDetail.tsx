@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { FaArrowLeft } from 'react-icons/fa'
-import { Button } from '/components/ui/button'
+import { Button } from '@/components/ui/button'
 import NotFoundPage from './NotFound'
 
 export default function TodoItemDetail() {
@@ -48,6 +48,8 @@ export default function TodoItemDetail() {
       </p>
 
       <Button
+        variant="default"
+        size="default"
         className="w-50 cursor-pointer"
         onClick={() => navigate('/todos')}
       >

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Button } from '/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { FaArrowLeft } from 'react-icons/fa'
 
 export default function NotFoundPage() {
@@ -11,7 +11,7 @@ export default function NotFoundPage() {
       <p className="text-destructive mb-10">
         Sorry, the page you are looking for does not exist.
       </p>
-      <Button className="w-50 mx-auto cursor-pointer">
+      <Button variant="default" size="default" className="w-50 mx-auto cursor-pointer">
         <FaArrowLeft />
         <Link to="/">Go back to Home</Link>
       </Button>

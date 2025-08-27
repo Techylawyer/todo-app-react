@@ -1,10 +1,26 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaTrash, FaEdit, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
-import { Button } from '/components/ui/button'
-import { Input } from '/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
-export default function TodoListItem({ todo, onUpdate, onDelete }) {
+type Todo = {
+  id: string
+  todo: string
+  completed: boolean
+}
+
+interface TodoListItemProps {
+  todo: Todo
+  onUpdate: (updatedTodo: Todo) => void
+  onDelete: (id: string) => void
+}
+
+export default function TodoListItem({
+  todo,
+  onUpdate,
+  onDelete,
+}: TodoListItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(todo.todo)
 
@@ -17,8 +33,10 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
     setIsEditing(false)
   }
 
-  const handleCancel = (e) => {
-    if (e.keyCode === 27) {
+  const handleCancel = (
+    e: React.KeyboardEvent<HTMLInputElement> | MouseEvent
+  ) => {
+    if ('key' in e && e.key === 'Escape') {
       setEditValue(todo.todo)
       setIsEditing(false)
     }
@@ -46,10 +64,13 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
             type="text"
             name="edit-todo"
             value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEditValue(e.target.value)
+            }
           />
           <div className="btn-group flex justify-between gap-5">
             <Button
+              variant="default"
               size="icon"
               className="size-6 cursor-pointer"
               type="submit"
@@ -58,6 +79,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
               <FaCheckCircle />
             </Button>
             <Button
+              variant="default"
               size="icon"
               className="size-6 cursor-pointer"
               aria-label="Cancel Editing"
@@ -92,6 +114,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
 
       <section className="btn-wrap flex gap-5">
         <Button
+          variant="default"
           size="icon"
           className="size-6 cursor-pointer"
           aria-label="Edit Todo"
@@ -100,6 +123,7 @@ export default function TodoListItem({ todo, onUpdate, onDelete }) {
           <FaEdit />
         </Button>
         <Button
+          variant="default"
           size="icon"
           className="size-6 cursor-pointer"
           aria-label="Delete Todo"

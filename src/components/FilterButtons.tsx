@@ -1,11 +1,11 @@
-import { Button } from '/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { useSearchParams } from 'react-router-dom'
 
 export default function FilterButtons() {
   const [searchParams, setSearchParams] = useSearchParams()
   const current = searchParams.get('filter') || 'all'
 
-  const setFilter = (filter) => {
+  const setFilter = (filter: string) => {
     const next = new URLSearchParams(searchParams)
     next.set('filter', filter)
     setSearchParams(next)
@@ -18,6 +18,8 @@ export default function FilterButtons() {
       aria-label="Filter Todos"
     >
       <Button
+        variant="default"
+        size="default"
         onClick={() => setFilter('all')}
         disabled={current === 'all'}
         className="btn btn-active btn-primary cursor-pointer"
@@ -25,6 +27,8 @@ export default function FilterButtons() {
         All
       </Button>
       <Button
+        variant="default"
+        size="default"
         className="btn btn-active btn-primary cursor-pointer"
         onClick={() => setFilter('active')}
         disabled={current === 'active'}
@@ -32,6 +36,8 @@ export default function FilterButtons() {
         Active
       </Button>
       <Button
+        variant="default"
+        size="default"
         className="btn btn-active btn-primary cursor-pointer"
         onClick={() => setFilter('completed')}
         disabled={current === 'completed'}

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import TodoPage from './TodoPage'
 import NotFoundPage from './NotFound'
 import TodoItemDetail from './TodoItemDetail'
@@ -18,7 +18,7 @@ export default function App() {
       }}
     >
       <main
-        region="main"
+        data-region="main"
         className="min-h-screen flex flex-col items-center 
          gap-10 bg-secondary p-5"
       >
@@ -33,7 +33,7 @@ export default function App() {
           <Route
             path="/test-error"
             element={
-              <ErrorBoundary fallback={<ErrorFallback />}>
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <TestError />
               </ErrorBoundary>
             }

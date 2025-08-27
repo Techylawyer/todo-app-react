@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import TodoForm from './TodoForm'
 import SearchInput from './SearchInput'
 import FilterButtons from './FilterButtons'
@@ -8,8 +8,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import localforage from 'localforage'
 import ReactPaginate from 'react-paginate'
-import { useSearchParams, Outlet, Link } from 'react-router-dom'
+import { useSearchParams, Outlet } from 'react-router-dom'
 import { Loader } from 'lucide-react'
+
+import type { QueryFunction, QueryFunctionContext } from '@tanstack/react-query'
+
+type Todo = {
+  id: number | string
+  todo: string
+  completed: boolean
+}
 
 const todosPerPage = 10
 
@@ -18,10 +26,15 @@ localforage.config({
   storeName: 'todos',
 })
 
-const getTodos = async ({ queryKey }) => {
+const getTodos: QueryFunction<
+  { todos: Todo[]; total: number },
+  [string, number]
+> = async ({ queryKey }: QueryFunctionContext<[string, number]>) => {
   const [_key, page] = queryKey
 
-  const cached = await localforage.getItem(`todos-page-${page}`)
+  const cached = await localforage.getItem<{ todos: Todo[]; total: number }>(
+    `todos-page-${page}`
+  )
   if (cached) {
     // console.log('Loaded from cache:', cached)
     // console.log('cached.todos:', cached.todos)
@@ -31,7 +44,10 @@ const getTodos = async ({ queryKey }) => {
   const res = await axios.get(
     `${API}?limit=${todosPerPage}&skip=${page * todosPerPage}`
   )
-  const data = { todos: res.data.todos, total: res.data.total }
+  const data = {
+    todos: res.data.todos as Todo[],
+    total: res.data.total as number,
+  }
 
   await localforage.setItem(`todos-page-${page}`, data)
   return data
@@ -42,12 +58,17 @@ export default function TodoPage() {
   const [newTodo, setNewTodo] = useState('')
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const currentPage = parseInt(searchParams.get('page')) || 1
+  const currentPage = Number(searchParams.get('page')) || 1
   const zeroBasedPage = currentPage - 1
   const filter = searchParams.get('filter') || 'all'
   const searchKeyword = searchParams.get('search') || ''
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error } = useQuery<
+    { todos: Todo[]; total: number },
+    Error,
+    { todos: Todo[]; total: number },
+    [string, number]
+  >({
     queryKey: ['todos', zeroBasedPage],
     queryFn: getTodos,
     keepPreviousData: true,
@@ -62,7 +83,7 @@ export default function TodoPage() {
     Math.ceil((data?.total ?? 0) / todosPerPage) - 1
   )
 
-  const createTodo = useMutation({
+  const createTodo = useMutation<any, unknown, Todo>({
     mutationFn: (newTodo) =>
       axios.post(API, {
         todo: newTodo.todo,
@@ -92,7 +113,7 @@ export default function TodoPage() {
 
       return { previousData }
     },
-    onError: (err, newTodo, context) => {
+    onError: ( context) => {
       queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
     },
     onSettled: () => {
@@ -127,7 +148,7 @@ export default function TodoPage() {
 
       return { previousData }
     },
-    onError: (err, updatedTodo, context) => {
+    onError: (context) => {
       queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
     },
     onSettled: () => {
@@ -159,7 +180,7 @@ export default function TodoPage() {
 
       return { previousData }
     },
-    onError: (err, id, context) => {
+    onError: (context) => {
       queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
     },
     onSettled: () => {
@@ -167,7 +188,7 @@ export default function TodoPage() {
     },
   })
 
-  const filteredTodos = (data?.todos || []).filter((todo) => {
+  const filteredTodos: Todo[] = (data?.todos || []).filter((todo) => {
     const matchesFilter =
       filter === 'all'
         ? true
@@ -182,18 +203,22 @@ export default function TodoPage() {
     return matchesFilter && matchesSearch
   })
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!newTodo.trim()) return
-    createTodo.mutate({ todo: newTodo, completed: false })
+    createTodo.mutate({
+      id: Date.now(),
+      todo: newTodo,
+      completed: false,
+    })
     setNewTodo('')
   }
 
-  const handleUpdate = (todo) => {
+  const handleUpdate = (todo: Todo) => {
     updateTodo.mutate(todo)
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: number | string) => {
     if (confirm('Are you sure you want to delete this todo?')) {
       deleteTodo.mutate(id)
     }
@@ -225,7 +250,7 @@ export default function TodoPage() {
       <section role="region" aria-label="Todo List">
         {isLoading ? (
           <div role="status" aria-live="polite" aria-busy="true">
-            <Loader className='w-20 h-20 text-primary animate-spin'/>
+            <Loader className="w-20 h-20 text-primary animate-spin" />
           </div>
         ) : isError ? (
           <div role="alert" className="text-destructive">
