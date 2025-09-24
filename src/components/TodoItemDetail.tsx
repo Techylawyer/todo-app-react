@@ -4,17 +4,25 @@ import { FaArrowLeft } from 'react-icons/fa'
 import { Button } from '@/components/ui/button'
 import NotFoundPage from './NotFound'
 
+type Todo = {
+  id: number
+  todo: string
+  completed: boolean
+  userId?: number
+}
+
 export default function TodoItemDetail() {
   const { todoId } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const findTodo = () => {
+  const findTodo = (): Todo | null => {
     const allQueries = queryClient
       .getQueryCache()
       .findAll({ queryKey: ['todos'] })
+
     for (let query of allQueries) {
-      const data = query.state.data
+      const data = query.state.data as { todos: Todo[] } | undefined
       if (!data) continue
       const match = data.todos.find((t) => t.id === Number(todoId))
       if (match) return match

@@ -10,13 +10,27 @@ import localforage from 'localforage'
 import ReactPaginate from 'react-paginate'
 import { useSearchParams, Outlet } from 'react-router-dom'
 import { Loader } from 'lucide-react'
+import type {
+  QueryFunction,
+  QueryFunctionContext,
+  UseMutateFunction,
+} from '@tanstack/react-query'
 
-import type { QueryFunction, QueryFunctionContext } from '@tanstack/react-query'
-
+// ✅ Types
 type Todo = {
   id: number | string
   todo: string
   completed: boolean
+  userId?: number
+}
+
+type TodosResponse = {
+  todos: Todo[]
+  total: number
+}
+
+type MutationContext = {
+  previousData: TodosResponse
 }
 
 const todosPerPage = 10
@@ -26,25 +40,21 @@ localforage.config({
   storeName: 'todos',
 })
 
-const getTodos: QueryFunction<
-  { todos: Todo[]; total: number },
-  [string, number]
-> = async ({ queryKey }: QueryFunctionContext<[string, number]>) => {
+// ✅ Query function
+const getTodos: QueryFunction<TodosResponse, [string, number]> = async ({
+  queryKey,
+}: QueryFunctionContext<[string, number]>) => {
   const [_key, page] = queryKey
 
-  const cached = await localforage.getItem<{ todos: Todo[]; total: number }>(
-    `todos-page-${page}`
-  )
+  const cached = await localforage.getItem<TodosResponse>(`todos-page-${page}`)
   if (cached) {
-    // console.log('Loaded from cache:', cached)
-    // console.log('cached.todos:', cached.todos)
     return cached
   }
 
   const res = await axios.get(
     `${API}?limit=${todosPerPage}&skip=${page * todosPerPage}`
   )
-  const data = {
+  const data: TodosResponse = {
     todos: res.data.todos as Todo[],
     total: res.data.total as number,
   }
@@ -63,18 +73,12 @@ export default function TodoPage() {
   const filter = searchParams.get('filter') || 'all'
   const searchKeyword = searchParams.get('search') || ''
 
-  const { data, isLoading, isError, error } = useQuery<
-    { todos: Todo[]; total: number },
-    Error,
-    { todos: Todo[]; total: number },
-    [string, number]
-  >({
+  // ✅ Strongly typed query
+  const { data, isLoading, isError, error } = useQuery<TodosResponse, Error>({
     queryKey: ['todos', zeroBasedPage],
     queryFn: getTodos,
     keepPreviousData: true,
   })
-
-  // console.log('Query data:', data)
 
   const totalTodos = data?.total ?? 0
 
@@ -83,28 +87,29 @@ export default function TodoPage() {
     Math.ceil((data?.total ?? 0) / todosPerPage) - 1
   )
 
-  const createTodo = useMutation<any, unknown, Todo>({
-    mutationFn: (newTodo) =>
-      axios.post(API, {
+  // ✅ Create Todo mutation
+  const createTodo = useMutation<Todo, Error, Todo, MutationContext>({
+    mutationFn: async (newTodo) => {
+      const res = await axios.post(API, {
         todo: newTodo.todo,
         completed: newTodo.completed,
         userId: 1,
-      }),
+      })
+      return res.data as Todo
+    },
     onMutate: async (newTodo) => {
-      await queryClient.cancelQueries(['todos', zeroBasedPage])
-      const previousData = queryClient.getQueryData([
+      await queryClient.cancelQueries({ queryKey: ['todos', zeroBasedPage] })
+      const previousData = queryClient.getQueryData<TodosResponse>([
         'todos',
         zeroBasedPage,
-      ]) || {
+      ]) ?? {
         todos: [],
         total: 0,
       }
 
-      const newItem = { ...newTodo, id: Date.now() }
-      const updatedTodos = [newItem, ...previousData.todos]
-
-      const newData = {
-        todos: updatedTodos,
+      const newItem: Todo = { ...newTodo, id: Date.now() }
+      const newData: TodosResponse = {
+        todos: [newItem, ...previousData.todos],
         total: previousData.total + 1,
       }
 
@@ -113,23 +118,28 @@ export default function TodoPage() {
 
       return { previousData }
     },
-    onError: ( context) => {
-      queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
+    onError: (_err, _newTodo, context) => {
+      if (context) {
+        queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
+      }
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['todos', zeroBasedPage])
+      queryClient.invalidateQueries({ queryKey: ['todos', zeroBasedPage] })
     },
   })
 
-  const updateTodo = useMutation({
-    mutationFn: ({ id, ...updatedTodo }) =>
-      axios.put(`${API}/${id}`, updatedTodo),
+  // ✅ Update Todo mutation
+  const updateTodo = useMutation<Todo, Error, Todo, MutationContext>({
+    mutationFn: async ({ id, ...updatedTodo }) => {
+      const res = await axios.put(`${API}/${id}`, updatedTodo)
+      return res.data as Todo
+    },
     onMutate: async (updatedTodo) => {
-      await queryClient.cancelQueries(['todos', zeroBasedPage])
-      const previousData = queryClient.getQueryData([
+      await queryClient.cancelQueries({ queryKey: ['todos', zeroBasedPage] })
+      const previousData = queryClient.getQueryData<TodosResponse>([
         'todos',
         zeroBasedPage,
-      ]) || {
+      ]) ?? {
         todos: [],
         total: 0,
       }
@@ -138,7 +148,7 @@ export default function TodoPage() {
         todo.id === updatedTodo.id ? { ...todo, ...updatedTodo } : todo
       )
 
-      const newData = {
+      const newData: TodosResponse = {
         todos: updatedTodos,
         total: previousData.total,
       }
@@ -148,46 +158,59 @@ export default function TodoPage() {
 
       return { previousData }
     },
-    onError: (context) => {
-      queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
+    onError: (_err, _updatedTodo, context) => {
+      if (context) {
+        queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
+      }
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['todos', zeroBasedPage])
+      queryClient.invalidateQueries({ queryKey: ['todos', zeroBasedPage] })
     },
   })
 
-  const deleteTodo = useMutation({
-    mutationFn: (id) => axios.delete(`${API}/${id}`),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries(['todos', zeroBasedPage])
-      const previousData = queryClient.getQueryData([
-        'todos',
-        zeroBasedPage,
-      ]) || {
-        todos: [],
-        total: 0,
-      }
+  // ✅ Delete Todo mutation
+  const deleteTodo = useMutation<void, Error, number | string, MutationContext>(
+    {
+      mutationFn: async (id) => {
+        await axios.delete(`${API}/${id}`)
+      },
+      onMutate: async (id) => {
+        await queryClient.cancelQueries({ queryKey: ['todos', zeroBasedPage] })
+        const previousData = queryClient.getQueryData<TodosResponse>([
+          'todos',
+          zeroBasedPage,
+        ]) ?? {
+          todos: [],
+          total: 0,
+        }
 
-      const updatedTodos = previousData.todos.filter((todo) => todo.id !== id)
+        const updatedTodos = previousData.todos.filter((todo) => todo.id !== id)
 
-      const newData = {
-        todos: updatedTodos,
-        total: previousData.total - 1,
-      }
+        const newData: TodosResponse = {
+          todos: updatedTodos,
+          total: previousData.total - 1,
+        }
 
-      queryClient.setQueryData(['todos', zeroBasedPage], newData)
-      await localforage.setItem(`todos-page-${zeroBasedPage}`, newData)
+        queryClient.setQueryData(['todos', zeroBasedPage], newData)
+        await localforage.setItem(`todos-page-${zeroBasedPage}`, newData)
 
-      return { previousData }
-    },
-    onError: (context) => {
-      queryClient.setQueryData(['todos', zeroBasedPage], context.previousData)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries(['todos', zeroBasedPage])
-    },
-  })
+        return { previousData }
+      },
+      onError: (_err, _id, context) => {
+        if (context) {
+          queryClient.setQueryData(
+            ['todos', zeroBasedPage],
+            context.previousData
+          )
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: ['todos', zeroBasedPage] })
+      },
+    }
+  )
 
+  // ✅ Derived todos
   const filteredTodos: Todo[] = (data?.todos || []).filter((todo) => {
     const matchesFilter =
       filter === 'all'
@@ -203,6 +226,7 @@ export default function TodoPage() {
     return matchesFilter && matchesSearch
   })
 
+  // ✅ Handlers
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!newTodo.trim()) return
@@ -223,9 +247,6 @@ export default function TodoPage() {
       deleteTodo.mutate(id)
     }
   }
-
-  // console.log('Fetched todos:', data?.todos)
-  // console.log('Filtered todos:', filteredTodos)
 
   return (
     <>
@@ -270,14 +291,13 @@ export default function TodoPage() {
         pageCount={Math.ceil(totalTodos / todosPerPage)}
         onPageChange={({ selected }) => {
           const next = new URLSearchParams(searchParams)
-          next.set('page', selected + 1)
-          // next.set('filter', 'all')
+          next.set('page', (selected + 1).toString())
           setSearchParams(next)
         }}
         forcePage={safePage}
-        containerClassName="flex items-center flex-wrap justify-center space-x-2  cursor-pointer gap-2 text-center mb-8"
+        containerClassName="flex items-center flex-wrap justify-center space-x-2 cursor-pointer gap-2 text-center mb-8"
         pageClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary transition"
-        pageLinkClassName="text-sm  hover:bg-background hover:text-primary"
+        pageLinkClassName="text-sm hover:bg-background hover:text-primary"
         activeClassName="bg-primary text-background"
         previousClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary"
         nextClassName="px-3 py-1 border rounded hover:bg-background hover:text-primary"
