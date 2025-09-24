@@ -4,16 +4,12 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-type Todo = {
-  id: string
-  todo: string
-  completed: boolean
-}
+import type { Todo } from './types'
 
-interface TodoListItemProps {
+type TodoListItemProps = {
   todo: Todo
-  onUpdate: (updatedTodo: Todo) => void
-  onDelete: (id: string) => void
+  onUpdate: (todo: Todo) => void
+  onDelete: (id: number) => void
 }
 
 export default function TodoListItem({

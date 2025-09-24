@@ -4,12 +4,7 @@ import { FaArrowLeft } from 'react-icons/fa'
 import { Button } from '@/components/ui/button'
 import NotFoundPage from './NotFound'
 
-type Todo = {
-  id: number
-  todo: string
-  completed: boolean
-  userId?: number
-}
+import type { Todo } from './types'
 
 export default function TodoItemDetail() {
   const { todoId } = useParams()

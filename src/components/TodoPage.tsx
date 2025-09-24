@@ -10,24 +10,12 @@ import localforage from 'localforage'
 import ReactPaginate from 'react-paginate'
 import { useSearchParams, Outlet } from 'react-router-dom'
 import { Loader } from 'lucide-react'
-import type {
-  QueryFunction,
-  QueryFunctionContext,
-  UseMutateFunction,
+import {
+  keepPreviousData,
+  type QueryFunction,
 } from '@tanstack/react-query'
 
-// ✅ Types
-type Todo = {
-  id: number | string
-  todo: string
-  completed: boolean
-  userId?: number
-}
-
-type TodosResponse = {
-  todos: Todo[]
-  total: number
-}
+import type { Todo, TodosResponse } from './types'
 
 type MutationContext = {
   previousData: TodosResponse
@@ -40,11 +28,8 @@ localforage.config({
   storeName: 'todos',
 })
 
-// ✅ Query function
-const getTodos: QueryFunction<TodosResponse, [string, number]> = async ({
-  queryKey,
-}: QueryFunctionContext<[string, number]>) => {
-  const [_key, page] = queryKey
+const getTodos: QueryFunction<TodosResponse> = async ({ queryKey }) => {
+  const [_key, page] = queryKey as readonly [string, number]
 
   const cached = await localforage.getItem<TodosResponse>(`todos-page-${page}`)
   if (cached) {
@@ -73,11 +58,11 @@ export default function TodoPage() {
   const filter = searchParams.get('filter') || 'all'
   const searchKeyword = searchParams.get('search') || ''
 
-  // ✅ Strongly typed query
+ 
   const { data, isLoading, isError, error } = useQuery<TodosResponse, Error>({
-    queryKey: ['todos', zeroBasedPage],
+    queryKey: ['todos', zeroBasedPage] as const,
     queryFn: getTodos,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   })
 
   const totalTodos = data?.total ?? 0
@@ -87,7 +72,7 @@ export default function TodoPage() {
     Math.ceil((data?.total ?? 0) / todosPerPage) - 1
   )
 
-  // ✅ Create Todo mutation
+  
   const createTodo = useMutation<Todo, Error, Todo, MutationContext>({
     mutationFn: async (newTodo) => {
       const res = await axios.post(API, {
@@ -128,7 +113,7 @@ export default function TodoPage() {
     },
   })
 
-  // ✅ Update Todo mutation
+  
   const updateTodo = useMutation<Todo, Error, Todo, MutationContext>({
     mutationFn: async ({ id, ...updatedTodo }) => {
       const res = await axios.put(`${API}/${id}`, updatedTodo)
@@ -168,8 +153,8 @@ export default function TodoPage() {
     },
   })
 
-  // ✅ Delete Todo mutation
-  const deleteTodo = useMutation<void, Error, number | string, MutationContext>(
+  
+  const deleteTodo = useMutation<void, Error, number, MutationContext>(
     {
       mutationFn: async (id) => {
         await axios.delete(`${API}/${id}`)
@@ -210,7 +195,7 @@ export default function TodoPage() {
     }
   )
 
-  // ✅ Derived todos
+  
   const filteredTodos: Todo[] = (data?.todos || []).filter((todo) => {
     const matchesFilter =
       filter === 'all'
@@ -226,7 +211,7 @@ export default function TodoPage() {
     return matchesFilter && matchesSearch
   })
 
-  // ✅ Handlers
+  
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!newTodo.trim()) return
@@ -242,7 +227,7 @@ export default function TodoPage() {
     updateTodo.mutate(todo)
   }
 
-  const handleDelete = (id: number | string) => {
+  const handleDelete = (id: number) => {
     if (confirm('Are you sure you want to delete this todo?')) {
       deleteTodo.mutate(id)
     }

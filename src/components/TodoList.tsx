@@ -1,15 +1,10 @@
 import TodoListItem from './TodoListItem'
-
-type Todo = {
-  id: string
-  todo: string
-  completed: boolean
-}
+import type { Todo } from './types'
 
 type TodoListProps = {
   todoList: Todo[]
-  onUpdate: (updatedTodo: Todo) => void
-  onDelete: (id: string) => void
+  onUpdate: (todo: Todo) => void
+  onDelete: (id: number) => void
 }
 
 export default function TodoList({ todoList, onUpdate, onDelete } : TodoListProps) {
