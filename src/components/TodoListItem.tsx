@@ -29,15 +29,27 @@ export default function TodoListItem({
     setIsEditing(false)
   }
 
-  const handleCancel = (
-    e: React.KeyboardEvent<HTMLInputElement> | MouseEvent
-  ) => {
-    if ('key' in e && e.key === 'Escape') {
+  // const handleCancel = (
+  //   e: React.KeyboardEvent<HTMLInputElement> | MouseEvent
+  // ) => {
+  //   if ('key' in e && e.key === 'Escape') {
+  //     setEditValue(todo.todo)
+  //     setIsEditing(false)
+  //   }
+  //   setEditValue(todo.todo)
+  //   setIsEditing(false)
+  // }
+
+  const handleCancelClick = () => {
+    setEditValue(todo.todo)
+    setIsEditing(false)
+  }
+
+  const handleCancelKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
       setEditValue(todo.todo)
       setIsEditing(false)
     }
-    setEditValue(todo.todo)
-    setIsEditing(false)
   }
 
   const handleToggle = () => {
@@ -63,6 +75,7 @@ export default function TodoListItem({
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setEditValue(e.target.value)
             }
+            onKeyDown={handleCancelKey}
           />
           <div className="btn-group flex justify-between gap-5">
             <Button
@@ -80,7 +93,7 @@ export default function TodoListItem({
               className="size-6 cursor-pointer"
               aria-label="Cancel Editing"
               type="button"
-              onClick={handleCancel}
+              onClick={handleCancelClick}
             >
               <FaTimesCircle />
             </Button>
